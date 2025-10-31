@@ -15,6 +15,8 @@ deployment_vars.env
 *.env
 *.env.*
 !.env.example
+RESUME*.md
+*RESUME*.md
 
 # Temporary files
 /tmp/
