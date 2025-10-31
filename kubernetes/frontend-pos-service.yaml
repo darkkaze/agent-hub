@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-pos
+  namespace: "${NAMESPACE}"
+  labels:
+    app: frontend-pos
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend-pos
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP

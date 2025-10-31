@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+  namespace: "${NAMESPACE}"
+  labels:
+    app: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:15-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h postgres -p 5432; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+      - name: wait-for-redis
+        image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until redis-cli -h redis ping; do
+            echo "Waiting for Redis..."
+            sleep 2
+          done
+      containers:
+      - name: n8n
+        image: n8nio/n8n:latest
+        ports:
+        - containerPort: 5678
+          name: http
+        env:
+        # Database Configuration
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_TYPE
+        - name: DB_POSTGRESDB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_HOST
+        - name: DB_POSTGRESDB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_PORT
+        - name: DB_POSTGRESDB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: DB_POSTGRESDB_DATABASE
+        - name: DB_POSTGRESDB_USER
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secret
+              key: N8N_DB_USER
+        - name: DB_POSTGRESDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secret
+              key: N8N_DB_PASSWORD
+
+        # Encryption
+        - name: N8N_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: n8n-secret
+              key: N8N_ENCRYPTION_KEY
+
+        # Host Configuration
+        - name: N8N_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_HOST
+        - name: WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: WEBHOOK_URL
+        - name: N8N_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PROTOCOL
+        - name: N8N_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PORT
+
+        # Features
+        - name: N8N_METRICS
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_METRICS
+        - name: N8N_BASIC_AUTH_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_BASIC_AUTH_ACTIVE
+        - name: N8N_PERSONALIZATION_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PERSONALIZATION_ENABLED
+        - name: N8N_DIAGNOSTICS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_DIAGNOSTICS_ENABLED
+        - name: N8N_VERSION_NOTIFICATIONS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_VERSION_NOTIFICATIONS_ENABLED
+        - name: N8N_TEMPLATES_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_TEMPLATES_ENABLED
+        - name: N8N_ONBOARDING_FLOW_DISABLED
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_ONBOARDING_FLOW_DISABLED
+
+        # Redis Configuration
+        - name: QUEUE_BULL_REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_HOST
+        - name: QUEUE_BULL_REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_PORT
+        - name: QUEUE_BULL_REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: QUEUE_BULL_REDIS_DB
+
+        # Timezone
+        - name: GENERIC_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: GENERIC_TIMEZONE
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: TZ
+
+        # Performance
+        - name: N8N_PAYLOAD_SIZE_MAX
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: N8N_PAYLOAD_SIZE_MAX
+        - name: EXECUTIONS_DATA_PRUNE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_PRUNE
+        - name: EXECUTIONS_DATA_MAX_AGE
+          valueFrom:
+            configMapKeyRef:
+              name: n8n-config
+              key: EXECUTIONS_DATA_MAX_AGE
+
+        volumeMounts:
+        - name: n8n-storage
+          mountPath: /home/node/.n8n
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 60
+          periodSeconds: 30
+
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+      volumes:
+      - name: n8n-storage
+        persistentVolumeClaim:
+          claimName: n8n-storage

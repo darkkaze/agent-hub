@@ -1,0 +1,71 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agent-hub-ingress
+  namespace: "${NAMESPACE}"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - "${INGRESS_HOST}"
+    - "${N8N_HOST}"
+    secretName: "${TLS_SECRET_NAME}"
+  rules:
+  - host: "${INGRESS_HOST}"
+    http:
+      paths:
+      - path: /staff-timetable/api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-staff-timetable
+            port:
+              number: 8002
+      - path: /staff-timetable
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-staff-timetable
+            port:
+              number: 80
+      - path: /pos/api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-pos
+            port:
+              number: 8001
+      - path: /pos
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-pos
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+  - host: "${N8N_HOST}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: n8n
+            port:
+              number: 5678

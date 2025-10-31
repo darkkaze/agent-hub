@@ -1,0 +1,113 @@
+# =============================================================================
+# Agent Hub - Root Level .gitignore
+# =============================================================================
+# Note: Each module (frontend/, backend/, etc.) has its own Git repository
+# with its own .gitignore. This file only applies to the root orchestration
+# directory if it becomes a Git repository.
+# =============================================================================
+
+# Kubernetes configuration files
+.kubeconfig
+*.kubeconfig
+
+# Deployment files (contain sensitive information)
+deployment_vars.env
+*.env
+*.env.*
+!.env.example
+
+# Temporary files
+/tmp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pip-log.txt
+
+# Python virtual environments (if any scripts are added at root level)
+venv/
+env/
+ENV/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node modules (if any tooling is added at root level)
+node_modules/
+.pnpm-store/
+
+# Build outputs (if any builds happen at root level)
+dist/
+build/
+*.egg-info/
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Kubernetes secrets (if exported locally)
+*-secret.yaml
+postgres-secret.yaml
+n8n-secret.yaml
+
+# Documentation build artifacts
+_site/
+.jekyll-cache/
+.docusaurus/
+
+# Terraform state files (if infrastructure as code is added)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Archives and compressed files
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z

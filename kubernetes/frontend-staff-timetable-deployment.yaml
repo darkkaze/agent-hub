@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-staff-timetable
+  namespace: "${NAMESPACE}"
+  labels:
+    app: frontend-staff-timetable
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-staff-timetable
+  template:
+    metadata:
+      labels:
+        app: frontend-staff-timetable
+    spec:
+      containers:
+      - name: frontend-staff-timetable
+        image: ghcr.io/darkkaze/chat-agent-hub-staff-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /staff-timetable/
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /staff-timetable/
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
