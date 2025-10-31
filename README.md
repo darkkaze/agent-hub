@@ -31,6 +31,8 @@ agent_hub/
 
 Each frontend/backend pair is a **separate Git repository** with independent GitHub Actions for CI/CD.
 
+**Deployment vs Development**: Module directories are only needed for development. For deployment, Kubernetes manifests pull pre-built Docker images from GitHub Container Registry (`ghcr.io`).
+
 ### Adding New Modules
 
 To add a new section (e.g., "Inventory" or "Analytics"):
@@ -119,6 +121,13 @@ https://kareninahub.nomada.dev/staff/api/    → Staff backend
 - Kubernetes cluster (Minikube, GKE, EKS, etc.)
 - `kubectl` configured
 - Docker registry access (GitHub Container Registry)
+
+> **Note**: You don't need to clone the module repositories (frontend/, backend/, etc.) to deploy the system. All Kubernetes manifests reference public Docker images from `ghcr.io/darkkaze/*`. You only need:
+> - `kubernetes/` directory with deployment manifests
+> - `deployment_vars.env` (or use `.env.example` as template)
+> - Deployment guides (*.md files)
+>
+> **Only clone the module repositories if you want to contribute to development or modify the source code.**
 
 ### Deployment Guides
 
