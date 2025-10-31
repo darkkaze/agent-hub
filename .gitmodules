@@ -1,0 +1,18 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/darkkaze/chat-agent-hub-frontend.git
+[submodule "backend"]
+	path = backend
+	url = https://github.com/darkkaze/chat-agent-hub-backend.git
+[submodule "frontend_pos"]
+	path = frontend_pos
+	url = https://github.com/darkkaze/chat-agent-hub-pos-frontend.git
+[submodule "backend_pos"]
+	path = backend_pos
+	url = https://github.com/darkkaze/chat-agent-hub-pos-backend.git
+[submodule "frontend_staff_timetable"]
+	path = frontend_staff_timetable
+	url = https://github.com/darkkaze/chat-agent-hub-staff-frontend.git
+[submodule "backend_staff_timetable"]
+	path = backend_staff_timetable
+	url = https://github.com/darkkaze/chat-agent-hub-staff-backend.git
