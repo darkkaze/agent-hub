@@ -105,6 +105,11 @@ spec:
             configMapKeyRef:
               name: backend-config
               key: ENVIRONMENT
+        - name: FRONTEND_PROJECT_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: FRONTEND_PROJECT_NAME
         resources:
           requests:
             memory: "256Mi"
