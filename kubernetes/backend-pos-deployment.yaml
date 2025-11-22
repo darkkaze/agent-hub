@@ -105,6 +105,11 @@ spec:
             configMapKeyRef:
               name: backend-pos-config
               key: ENVIRONMENT
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: backend-pos-config
+              key: TZ
         resources:
           requests:
             memory: "256Mi"
